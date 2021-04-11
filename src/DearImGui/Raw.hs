@@ -79,6 +79,7 @@ module DearImGui.Raw
     -- * Widgets
     -- ** Text
   , text
+  , textWrapped
 
     -- ** Main
   , button
@@ -359,6 +360,12 @@ text :: (MonadIO m) => CString -> m ()
 text textPtr = liftIO do
   [C.exp| void { Text("%s", $(char* textPtr)) } |]
 
+-- | Formatted text.
+--
+-- Wraps @ImGui::TextWrapped()@.
+textWrapped :: (MonadIO m) => CString -> m ()
+textWrapped textPtr = liftIO do
+  [C.exp| void { TextWrapped("%s", $(char* textPtr)) } |]
 
 -- | A button. Returns 'True' when clicked.
 --

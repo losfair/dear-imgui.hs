@@ -79,6 +79,7 @@ module DearImGui
     -- * Widgets
     -- ** Text
   , text
+  , textWrapped
 
     -- ** Main
   , button
@@ -219,6 +220,13 @@ beginChild name = liftIO do
 text :: MonadIO m => String -> m ()
 text t = liftIO do
   withCString t Raw.text
+
+-- | Formatted text.
+--
+-- Wraps @ImGui::TextWrapped()@.
+textWrapped :: MonadIO m => String -> m ()
+textWrapped t = liftIO do
+  withCString t Raw.textWrapped
 
 
 -- | A button. Returns 'True' when clicked.
