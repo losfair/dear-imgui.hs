@@ -158,6 +158,8 @@ module DearImGui
     -- * Item/Widgets Utilities
   , Raw.isItemHovered
 
+  , Raw.setScrollHereY
+
     -- * Types
   , module DearImGui.Enums
   , module DearImGui.Structs

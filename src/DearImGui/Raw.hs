@@ -158,6 +158,8 @@ module DearImGui.Raw
     -- * Item/Widgets Utilities
   , isItemHovered
 
+  , setScrollHereY
+
     -- * Types
   , module DearImGui.Enums
   , module DearImGui.Structs
@@ -880,3 +882,11 @@ pushStyleVar style valPtr = liftIO do
 popStyleVar :: (MonadIO m) => CInt -> m ()
 popStyleVar n = liftIO do
   [C.exp| void { PopStyleVar($(int n)) } |]
+
+
+-- SetScrollHereY
+--
+-- Wraps @ImGui::SetScrollHereY()@
+setScrollHereY :: (MonadIO m) => CFloat -> m ()
+setScrollHereY pos = liftIO do
+  [C.exp| void { SetScrollHereY($(float pos)) } |]
