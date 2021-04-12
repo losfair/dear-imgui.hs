@@ -80,6 +80,7 @@ module DearImGui.Raw
     -- ** Text
   , text
   , textWrapped
+  , textUnformatted
 
     -- ** Main
   , button
@@ -369,6 +370,14 @@ text textPtr = liftIO do
 textWrapped :: (MonadIO m) => CString -> m ()
 textWrapped textPtr = liftIO do
   [C.exp| void { TextWrapped("%s", $(char* textPtr)) } |]
+
+-- | Unformatted text.
+--
+-- Wraps @ImGui::TextUnformatted()@.
+textUnformatted :: (MonadIO m) => CStringLen -> m ()
+textUnformatted (textPtr, textLen) = liftIO do
+  let textEnd = plusPtr textPtr textLen
+  [C.exp| void { TextUnformatted($(char* textPtr), $(char* textEnd)) } |]
 
 -- | A button. Returns 'True' when clicked.
 --
