@@ -108,6 +108,7 @@ module DearImGui
 
     -- ** Text Input
   , inputText
+  , inputTextEnterReturnsTrue
 
     -- * Color Editor/Picker
   , colorPicker3
@@ -445,6 +446,18 @@ inputText desc ref refSize = liftIO do
 
       return changed
 
+inputTextEnterReturnsTrue :: (MonadIO m, HasSetter ref String, HasGetter ref String) => String -> ref -> Int -> m Bool
+inputTextEnterReturnsTrue desc ref refSize = liftIO do
+  input <- get ref
+  withCString input \ refPtr -> do
+    withCString desc \ descPtr -> do
+      let refSize' :: CInt
+          refSize' = fromIntegral refSize
+      changed <- Raw.inputTextEnterReturnsTrue descPtr refPtr refSize'
+
+      peekCString refPtr >>= ($=!) ref
+
+      return changed
 
 -- | Wraps @ImGui::ColorPicker3()@.
 colorPicker3 :: (MonadIO m, HasSetter ref ImVec3, HasGetter ref ImVec3) => String -> ref -> m Bool

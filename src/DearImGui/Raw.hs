@@ -108,6 +108,7 @@ module DearImGui.Raw
 
     -- ** Text Input
   , inputText
+  , inputTextEnterReturnsTrue
 
     -- * Color Editor/Picker
   , colorPicker3
@@ -491,6 +492,10 @@ inputText :: (MonadIO m) => CString -> CString -> CInt -> m Bool
 inputText descPtr refPtr refSize = liftIO do
   (0 /= ) <$> [C.exp| bool { InputText( $(char* descPtr), $(char* refPtr), $(int refSize) ) } |]
 
+-- | Wraps @ImGui::InputText()@.
+inputTextEnterReturnsTrue :: (MonadIO m) => CString -> CString -> CInt -> m Bool
+inputTextEnterReturnsTrue descPtr refPtr refSize = liftIO do
+  (0 /= ) <$> [C.exp| bool { InputText( $(char* descPtr), $(char* refPtr), $(int refSize), ImGuiInputTextFlags_EnterReturnsTrue ) } |]
 
 -- | Wraps @ImGui::ColorPicker3()@.
 colorPicker3 :: (MonadIO m) => CString -> Ptr CFloat -> m Bool
