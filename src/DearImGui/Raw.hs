@@ -40,6 +40,8 @@ module DearImGui.Raw
   , styleColorsLight
   , styleColorsClassic
 
+  , scaleAllSizes
+
     -- * Windows
   , begin
   , end
@@ -307,6 +309,11 @@ styleColorsClassic :: (MonadIO m) => m ()
 styleColorsClassic = liftIO do
   [C.exp| void { StyleColorsClassic(); } |]
 
+
+scaleAllSizes :: (MonadIO m) => Float -> m ()
+scaleAllSizes factor_ = liftIO do
+  let factor = CFloat factor_
+  [C.exp| void { GetStyle().ScaleAllSizes($(float factor)); } |]
 
 -- | Push window to the stack and start appending to it.
 --
