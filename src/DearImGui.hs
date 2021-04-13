@@ -107,8 +107,7 @@ module DearImGui
   , sliderFloat4
 
     -- ** Text Input
-  , inputText
-  , inputTextEnterReturnsTrue
+  , inputTextB
 
     -- * Color Editor/Picker
   , colorPicker3
@@ -191,6 +190,7 @@ import Control.Monad.IO.Class
 
 import qualified DearImGui.Raw as Raw
 
+import qualified Data.ByteString as B
 
 -- | Get the compiled version string e.g. "1.80 WIP" (essentially the value for
 -- @IMGUI_VERSION@ from the compiled version of @imgui.cpp@).
@@ -430,32 +430,25 @@ sliderFloat4 desc ref minValue maxValue = liftIO do
 
     return changed
 
+inputTextB :: (MonadIO m, HasSetter ref B.ByteString, HasGetter ref B.ByteString) => B.ByteString -> ref -> Int -> Bool -> m Bool
+inputTextB desc ref inputLen enterReturnsTrue = liftIO do
+  input_ <- get ref
 
--- | Wraps @ImGui::InputText()@.
-inputText :: (MonadIO m, HasSetter ref String, HasGetter ref String) => String -> ref -> Int -> m Bool
-inputText desc ref refSize = liftIO do
-  input <- get ref
-  withCString input \ refPtr -> do
-    withCString desc \ descPtr -> do
+  -- Get a large enough buffer
+  let input = if inputLen > B.length input_ then
+                B.concat [input_, B.replicate (inputLen - B.length input_) 0]
+              else
+                input_
+
+  B.useAsCString input \ refPtr -> do
+    B.useAsCString desc \ descPtr -> do
       let refSize' :: CInt
-          refSize' = fromIntegral refSize
-      changed <- Raw.inputText descPtr refPtr refSize'
+          refSize' = fromIntegral (B.length input + 1) -- include the null terminator
+      changed <- (if enterReturnsTrue then Raw.inputTextEnterReturnsTrue else Raw.inputText) descPtr refPtr refSize'
 
-      when changed do
-        peekCString refPtr >>= ($=!) ref
-
-      return changed
-
-inputTextEnterReturnsTrue :: (MonadIO m, HasSetter ref String, HasGetter ref String) => String -> ref -> Int -> m Bool
-inputTextEnterReturnsTrue desc ref refSize = liftIO do
-  input <- get ref
-  withCString input \ refPtr -> do
-    withCString desc \ descPtr -> do
-      let refSize' :: CInt
-          refSize' = fromIntegral refSize
-      changed <- Raw.inputTextEnterReturnsTrue descPtr refPtr refSize'
-
-      peekCString refPtr >>= ($=!) ref
+      when (changed || enterReturnsTrue) do
+        b <- liftIO $ B.packCString refPtr
+        ref $=! b
 
       return changed
 
