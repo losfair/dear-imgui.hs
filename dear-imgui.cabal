@@ -94,6 +94,10 @@ library
     , StateVar
     , bytestring
 
+  if os(windows)
+    include-dirs:
+      glfw-windows
+
   if flag(opengl2)
     exposed-modules:
       DearImGui.OpenGL2
