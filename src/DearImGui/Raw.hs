@@ -41,6 +41,10 @@ module DearImGui.Raw
   , styleColorsClassic
 
   , scaleAllSizes
+  , Font
+  , addFontFromFileTTF
+  , pushFont
+  , popFont
 
     -- * Windows
   , begin
@@ -196,6 +200,9 @@ Cpp.using "namespace ImGui"
 -- | Wraps @ImGuiContext*@.
 newtype Context = Context (Ptr ())
 
+-- | Wraps @ImFont*@.
+newtype Font = Font (Ptr ())
+
 
 -- | Wraps @ImGui::CreateContext()@.
 createContext :: (MonadIO m) => m Context
@@ -314,6 +321,19 @@ scaleAllSizes :: (MonadIO m) => Float -> m ()
 scaleAllSizes factor_ = liftIO do
   let factor = CFloat factor_
   [C.exp| void { GetStyle().ScaleAllSizes($(float factor)); } |]
+
+addFontFromFileTTF :: (MonadIO m) => CString -> Float -> m Font
+addFontFromFileTTF path sizePixels_ = liftIO do
+  let sizePixels = CFloat sizePixels_
+  Font <$> [C.exp| void* { GetIO().Fonts->AddFontFromFileTTF($(char* path), $(float sizePixels)) }|]
+
+pushFont :: (MonadIO m) => Font -> m ()
+pushFont (Font font) = liftIO do
+  [C.exp| void { PushFont((ImFont*) $(void* font)); } |]
+
+popFont :: (MonadIO m) => m ()
+popFont = liftIO do
+  [C.exp| void { PopFont(); }|]
 
 -- | Push window to the stack and start appending to it.
 --
