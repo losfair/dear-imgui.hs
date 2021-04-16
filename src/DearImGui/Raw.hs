@@ -45,6 +45,7 @@ module DearImGui.Raw
   , addFontFromFileTTF
   , pushFont
   , popFont
+  , setFontGlobalScale
 
     -- * Windows
   , begin
@@ -326,6 +327,11 @@ addFontFromFileTTF :: (MonadIO m) => CString -> Float -> m Font
 addFontFromFileTTF path sizePixels_ = liftIO do
   let sizePixels = CFloat sizePixels_
   Font <$> [C.exp| void* { GetIO().Fonts->AddFontFromFileTTF($(char* path), $(float sizePixels)) }|]
+
+setFontGlobalScale :: (MonadIO m) => Float -> m ()
+setFontGlobalScale scale_ = liftIO do
+  let scale = CFloat scale_
+  [C.exp| void { GetIO().FontGlobalScale = $(float scale); } |]
 
 pushFont :: (MonadIO m) => Font -> m ()
 pushFont (Font font) = liftIO do
